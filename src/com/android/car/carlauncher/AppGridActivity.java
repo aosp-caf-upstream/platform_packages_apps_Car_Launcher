@@ -73,11 +73,18 @@ public final class AppGridActivity extends Activity {
         mGridAdapter = new AppGridAdapter(this, getAllApps(), mColumnNumber);
 
         PagedListView gridView = findViewById(R.id.apps_grid);
+
         gridView.setDayNightStyle(DayNightStyle.AUTO);
+
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, mColumnNumber);
         gridView.getRecyclerView().setLayoutManager(gridLayoutManager);
 
         gridView.setAdapter(mGridAdapter);
+
+        gridView.setDividerVisibilityManager(position -> {
+            // only show divider under the first row (most recently used apps)
+            return position >= mColumnNumber;
+        });
     }
 
     @Override
@@ -110,8 +117,9 @@ public final class AppGridActivity extends Activity {
 
         int currentIndex = 0;
         int itemsAdded = 0;
-        int itemCount = Math.min(mColumnNumber, stats.size());
-        while (itemsAdded < itemCount) {
+        int statsSize = stats.size();
+        int itemCount = Math.min(mColumnNumber, statsSize);
+        while (itemsAdded < itemCount && currentIndex < statsSize) {
             String packageName = stats.get(currentIndex).getPackageName();
             currentIndex++;
 
